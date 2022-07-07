@@ -6,16 +6,17 @@ from data import data_loaders
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from utils.Learning_Rate import WarmUpLR
+from utils.learning_rate import WarmUpLR
 from tensorboardX import SummaryWriter
-from models.resnet import *
+from utils.load_model import load_model
+from models import *
 
 CIFAR100_TRAIN_MEAN = (0.5070751592371323, 0.48654887331495095, 0.4409178433670343)
 CIFAR100_TRAIN_STD = (0.2673342858792401, 0.2564384629170883, 0.27615047132568404)
 
 
 def training_api(net, training_data_loader, optimizer, loss_function,
-                 warmup_scheduler, batch_size, warm_up_epoch_num, epoch_num, writer):
+                 warmup_scheduler, batch_size, warm_up_epoch_num, epoch_num, writer, use_gpu):
 
     start = time.time()
     # Puts the Neural Net in Training Mode
@@ -23,6 +24,9 @@ def training_api(net, training_data_loader, optimizer, loss_function,
 
     # Iterates through each batch
     for batch_index, (images, labels) in enumerate(training_data_loader):
+        if use_gpu:
+            images = images.cuda()
+            labels = labels.cuda()
         # Clears gradient on each parameter/layer/weight
         optimizer.zero_grad()
         # Calls forward function, thus making a prediction
@@ -61,7 +65,7 @@ def training_api(net, training_data_loader, optimizer, loss_function,
 
 
 @torch.no_grad()
-def eval_training(net, testing_data_loader, loss_function, writer, epoch=0, tb=True):
+def eval_training(net, testing_data_loader, loss_function, writer, epoch=0, tb=True, use_gpu=False):
     start = time.time()
     net.eval()
 
@@ -69,6 +73,9 @@ def eval_training(net, testing_data_loader, loss_function, writer, epoch=0, tb=T
     correct = 0.0
 
     for (images, labels) in testing_data_loader:
+        if use_gpu:
+            images = images.cuda()
+            labels = labels.cuda()
         outputs = net(images)
         loss = loss_function(outputs, labels)
 
@@ -93,11 +100,10 @@ def eval_training(net, testing_data_loader, loss_function, writer, epoch=0, tb=T
     return correct.float() / len(testing_data_loader.dataset)
 
 
-def train(net_name="resnet18", batch_size=128, warm_epoch=1, lr=0.1):
+def train(net_name="resnet18", batch_size=128, warm_epoch=1, lr=0.1, use_gpu=False):
 
     # Initialize Neural Net, Loss Function, Optimizer, and LR Scheduler
-    net_class = getattr(sys.modules['models.resnet'], net_name)
-    net = net_class()
+    net = load_model(net_name)
     loss_function = nn.CrossEntropyLoss()
     optimizer = optim.SGD(net.parameters(), lr=lr, momentum=0.9, weight_decay=5e-4)
     train_scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=[60, 120, 160], gamma=0.2)
@@ -129,10 +135,10 @@ def train(net_name="resnet18", batch_size=128, warm_epoch=1, lr=0.1):
 
         # Does the Training for One Epoch
         training_api(net, training_data_loader, optimizer, loss_function,
-                     warmup_scheduler, batch_size, warm_epoch, epoch, writer)
+                     warmup_scheduler, batch_size, warm_epoch, epoch, writer, use_gpu)
 
         # Test this Epoch
-        acc = eval_training(net, testing_data_loader, loss_function, writer, epoch)
+        acc = eval_training(net, testing_data_loader, loss_function, writer, epoch, tb=True, use_gpu=False)
 
         # Start Saving Best Performance Models after LR Decays to 0.01
         if epoch > 120 and best_acc < acc:

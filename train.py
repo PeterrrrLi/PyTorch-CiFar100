@@ -10,9 +10,12 @@ if __name__ == "__main__":
     parser.add_argument('--batch_size', type=int, default=128, help='batch size for dataloader')
     parser.add_argument('--warm_up', type=int, default=1, help='warm up training phase')
     parser.add_argument('--lr', type=float, default=0.1, help='initial learning rate')
+    parser.add_argument('--gpu', default=False, action="store_true", help='Whether to use gpu')
+
     args = parser.parse_args()
     net_name = args.net
+    gpu = args.gpu
     batch_size = args.batch_size
     warm_epoch = args.warm_up
     lr = args.lr
-    train(net_name, batch_size, warm_epoch, lr)
+    train(net_name, batch_size, warm_epoch, lr, gpu)
