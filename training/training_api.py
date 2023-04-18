@@ -1,3 +1,15 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    training_api.py                                    :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: peterli <j2457li@uwaterloo.ca>             +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2023/04/17 21:53:09 by peterli           #+#    #+#              #
+#    Updated: 2023/04/17 22:09:24 by peterli          ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
 import os.path
 import sys
 import time
@@ -131,7 +143,7 @@ def train(net_name="resnet18", batch_size=128, warm_epoch=1, lr=0.1, use_gpu=Fal
     best_acc = 0.0
     for epoch in range(1, 30 + 1):
         if epoch > warm_epoch:
-            train_scheduler.step(epoch)
+            train_scheduler.step()
 
         # Does the Training for One Epoch
         training_api(net, training_data_loader, optimizer, loss_function,

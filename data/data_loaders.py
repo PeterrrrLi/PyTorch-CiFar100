@@ -1,3 +1,15 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    data_loaders.py                                    :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: peterli <j2457li@uwaterloo.ca>             +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2023/04/17 22:09:17 by peterli           #+#    #+#              #
+#    Updated: 2023/04/17 22:09:19 by peterli          ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
 import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader

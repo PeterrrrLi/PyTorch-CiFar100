@@ -1,16 +1,30 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    train.py                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: peterli <j2457li@uwaterloo.ca>             +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2023/04/17 21:43:13 by j2457li           #+#    #+#              #
+#    Updated: 2023/04/17 22:05:41 by peterli          ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
 import sys, os
 import argparse
-sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 from training.training_api import train
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser("Train a ResNet Model (with variable number of layers) on Cifar100 Dataset")
-    parser.add_argument('--net', type=str, required=True, help='net type')
-    parser.add_argument('--batch_size', type=int, default=128, help='batch size for dataloader')
-    parser.add_argument('--warm_up', type=int, default=1, help='warm up training phase')
-    parser.add_argument('--lr', type=float, default=0.1, help='initial learning rate')
-    parser.add_argument('--gpu', default=False, action="store_true", help='Whether to use gpu')
+    parser = argparse.ArgumentParser(
+        prog="train.py",
+        description="Train the Classification Model on Cifar100 Dataset",
+        epilog="Author: Peter Li")
+    parser.add_argument("-n", "--net", type=str, required=True, help="Neural Net Name")
+    parser.add_argument("-b", "--batch_size", type=int, default=128, help="Batch Size")
+    parser.add_argument("-w", "--warm_up", type=int, default=0, help="Number of Epochs for Warm-Up Training")
+    parser.add_argument("-l", "--lr", type=float, default=0.01, help="Initial Learning Rate")
+    parser.add_argument("--gpu", default=False, action="store_true", help="Enable CUDA for GPU Training")
 
     args = parser.parse_args()
     net_name = args.net
